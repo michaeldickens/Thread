@@ -10,7 +10,7 @@ DEFAULT_FLAGS = $(DEBUG_FLAGS)
 
 LDLIBS = -lm -lpthread
 
-PROGRAMS = semaphore_test
+PROGRAMS = atom_test semaphore_test
 
 all: $(PROGRAMS)
 all: CFLAGS += $(DEFAULT_FLAGS)
@@ -24,7 +24,11 @@ profile: CFLAGS += $(PROFILE_FLAGS)
 release: $(PROGRAMS)
 release: CFLAGS += $(RELEASE_FLAGS)
 
+atom_test: atom_test.o atom.o
 semaphore_test: semaphore_test.o semaphore.o
+
+atom_test.o: atom.h
+semaphore_test.o: semaphore.h
 
 clean: 
 	rm -f $(programs) *.o callgrind.out.*
