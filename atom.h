@@ -20,7 +20,7 @@
  * Creates a trivial clear function that performs no operation.
  */
 #define TRIVIAL_CLEAR(name, type)					   \
-	void name ## _trivial_clear(type core) {}
+	void name##_trivial_clear(type core) {}
 
 #define ATOM_LOCK(atom) pthread_mutex_lock(&(atom)->lock)
 
@@ -94,6 +94,8 @@
 		pthread_mutex_t lock;									\
 		type core;												\
 	} name##_atom_t;											\
+																\
+	typedef type name##_atom_value_t;							\
 																\
 	name##_atom_t name##_atom_init()							\
 	{															\
@@ -172,19 +174,19 @@
  *
  * The rest of the arguments are values to be passed to `fn`.
  */
-#define ATOM_SWAP(name, atom, fn, ...)						\
-	do {													\
-        type value = name##_atom_get(atom);                 \
-		do {										    	\
-			type res = fn(value, __VA_ARGS__);				\
-			ATOM_LOCK(atom);								\
-			if (value == (atom)->core) {					\
-                (atom)->core = res;							\
-				ATOM_UNLOCK(atom);							\
-				return 0;									\
-			}												\
-			value = (atom)->core;						   	\
-            ATOM_UNLOCK(atom);								\
-		} while (1);										\
+#define ATOM_SWAP(name, atom, fn, ...)							\
+	do {														\
+        name##_atom_value_t value = name##_atom_get(atom);		\
+		do {										    	    \
+			name##_atom_value_t res = fn(value, ##__VA_ARGS__);	\
+			ATOM_LOCK(atom);			    					\
+			if (value == (atom)->core) {						\
+				(atom)->core = res;								\
+				ATOM_UNLOCK(atom);								\
+				break;											\
+			}													\
+			value = (atom)->core;								\
+			ATOM_UNLOCK(atom);									\
+		} while (1);											\
 	} while (0);											
 	

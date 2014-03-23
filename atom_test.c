@@ -11,6 +11,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h> // for malloc
 #include <unistd.h> // for sleep
 #include "atom.h"
 
@@ -49,24 +50,69 @@ void test_int_swap()
 }
 
 struct node {
-	int value;
-	struct node *next;
-}
+	int head;
+	struct node *tail;
+};
 
-	TRIVIAL_CLEAR(list, struct node *);
+TRIVIAL_CLEAR(list, struct node *);
 
 ATOM_TYPE(list, struct node *, list_trivial_clear);
+
+struct node *cons(struct node *xs, int x)
+{
+	usleep(10000);
+	struct node *res = malloc(sizeof(struct node));
+	res->head = x;
+	res->tail = xs;
+	return res;
+}
+
+void print_list(struct node *xs)
+{
+	if (xs == NULL) {
+		printf("nil\n");
+	} else {
+		printf("%d : ", xs->head);
+		print_list(xs->tail);
+	}
+}
+
+int length(struct node *xs)
+{
+	if (xs == NULL) return 0;
+	else return 1 + length(xs->tail);
+}
+
+void *test_list_swap_2(void *args)
+{
+	list_atom_t *atom_ptr = (list_atom_t *) args;
+	for (size_t i = 0; i < 20; i++) {
+		ATOM_SWAP(list, atom_ptr, cons, 2);
+	}
+
+	return NULL;
+}
 
 void test_list_swap()
 {
 	list_atom_t atom = list_atom_init_set(NULL);
 
-	list_atom_swap()
+	pthread_t thread;
+	pthread_create(&thread, NULL, test_list_swap_2, (void *) &atom);
+
+	for (size_t i = 0; i < 20; i++) {
+		ATOM_SWAP(list, &atom, cons, 1);
+	}
+
+	pthread_join(thread, NULL);
+
+	print_list(list_atom_get(&atom));
+	printf("length: %d\n", length(list_atom_get(&atom)));
 }
 
-int main(int argc, const char *argv[])
+int main()
 {
-	test_int_swap();
+	test_list_swap();
 
     return 0;
 }
