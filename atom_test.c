@@ -54,9 +54,7 @@ struct node {
 	struct node *tail;
 };
 
-TRIVIAL_CLEAR(list, struct node *);
-
-ATOM_TYPE(list, struct node *, list_trivial_clear);
+ATOM_TYPE(list, struct node *, clear_list);
 
 struct node *cons(struct node *xs, int x)
 {
@@ -65,6 +63,14 @@ struct node *cons(struct node *xs, int x)
 	res->head = x;
 	res->tail = xs;
 	return res;
+}
+
+void clear_list(struct node *xs)
+{
+	if (xs != NULL) {
+		clear_list(xs->tail);
+		free(xs);
+	}
 }
 
 void print_list(struct node *xs)
@@ -108,6 +114,7 @@ void test_list_swap()
 
 	print_list(list_atom_get(&atom));
 	printf("length: %d\n", length(list_atom_get(&atom)));
+	list_atom_clear(&atom);
 }
 
 int main()
