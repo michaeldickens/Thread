@@ -54,6 +54,14 @@ struct node {
 	struct node *tail;
 };
 
+void clear_list(struct node *xs)
+{
+	if (xs != NULL) {
+		clear_list(xs->tail);
+		free(xs);
+	}
+}
+
 ATOM_TYPE(list, struct node *, clear_list);
 
 struct node *cons(struct node *xs, int x)
@@ -63,14 +71,6 @@ struct node *cons(struct node *xs, int x)
 	res->head = x;
 	res->tail = xs;
 	return res;
-}
-
-void clear_list(struct node *xs)
-{
-	if (xs != NULL) {
-		clear_list(xs->tail);
-		free(xs);
-	}
 }
 
 void print_list(struct node *xs)
