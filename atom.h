@@ -13,7 +13,8 @@
  * get/set at atom at once, one of the threads blocks until the other
  * finishes.
  *
- * Whenever possible, use 
+ * Whenever possible, use `name_atom_swap` or `ATOM_SWAP` to operate
+ * on an atom. Only use `name_atom_set` where absolutely necessary.
  */
 
 #include <pthread.h>
@@ -30,7 +31,7 @@
 
 /*
  * Atom definition. Call this to allow usage of an atom of a
- * particular type.
+ * particular type. See "Example" below.
  *
  * `name`: The name of the type to use. This name will be used for all
  * functions related to the atom.
@@ -38,9 +39,29 @@
  * `type`: The type to use internally with the atom.
  *
  * `clear_fn`: A function with the type signature
- *   int clear_fn(type value)
- *   that clears the value. If the type is not dynamically, allocated,
- *   use the TRIVIAL_CLEAR macro to create a clear function.
+ *    void clear_fn(type value)
+ *  that clears the value. If the type is not dynamically allocated,
+ *  use the TRIVIAL_CLEAR macro to create a clear function.
+ *
+ * Example
+ * -------
+ *
+ * > TRIVIAL_CLEAR(int, int);
+ * 
+ * This creates a function called `int_trivial_clear` that takes in an
+ * int and does nothing.
+ * 
+ * > ATOM_TYPE(int, int, int_trivial_clear);
+ *
+ * This creates all the functions to operate on int atoms:
+ * `int_atom_init`, `int_atom_swap`, etc. You may then perform
+ * operations such as
+ *
+ * > int_atom_t atom = int_atom_init_set(5);
+ *
+ * This initializes an `int_atom_t` with value 5. `int_atom_init_set`
+ * is a true function, not a macro, so it performs compile-time type
+ * checking.
  *
  * Public Functions
  * -----------------
