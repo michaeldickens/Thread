@@ -83,8 +83,8 @@ enum {
             queue->first = queue->last = name##_queue_node_init(value); \
         } else {                                                        \
             name##_queue_node_t *saved = queue->last;                   \
-                queue->last = name##_queue_node_init(value);            \
-                    saved->tail = queue->last;                          \
+            queue->last = name##_queue_node_init(value);                \
+            saved->tail = queue->last;                                  \
         }                                                               \
         QUEUE_UNLOCK(queue);                                            \
         return 0;                                                       \
