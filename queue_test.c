@@ -11,25 +11,45 @@
 #include <stdio.h>
 #include "queue.h"
 
-UNSAFE_QUEUE_TYPE(int, int);
+QUEUE_TYPE(int, int);
+
+const int NUM_ELEMS = 10000;
+
+void *basic_test_thread2(void *args)
+{
+    int_queue_t *q = (int_queue_t *) args;
+
+    for (int i = 0; i < NUM_ELEMS; i++) {
+        printf("equeuing %d\n", i + 1);
+        int_queue_enq(q, i + 1);
+    }
+
+    return NULL;
+}
 
 void basic_test()
 {
-    int_uqueue_t q = int_uqueue_init();
+    int_queue_t q = int_queue_init();
 
-    for (size_t i = 0; i < 5; i++) {
-        int_uqueue_enq(&q, i + 1);
-    }
+    pthread_t thread;
+    pthread_create(&thread, NULL, basic_test_thread2, (void *) &q);
 
     int value;
-    for (size_t i = 0; i < 5; i++) {
-        int_uqueue_deq(&q, &value);
-        printf("%d\n", value);
+    int sum = 0;
+    for (size_t i = 0; i < NUM_ELEMS; ) {
+        int code = int_queue_deq(&q, &value);
+        if (code == 0) {
+            sum += value;
+            printf("%d\n", value);
+            i++;
+        } else {
+            printf("code %d\n", code);
+        }
     }
 
-    int code = int_uqueue_deq(&q, &value);
-    printf("return code %d, value %d\n", code, value);
+    pthread_join(thread, NULL);
 
+    printf("sum = %d (expected %d)\n", sum, NUM_ELEMS * (NUM_ELEMS + 1) / 2);
 }
 
 int main()
