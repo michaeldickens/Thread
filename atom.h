@@ -30,8 +30,8 @@
 #define ATOM_UNLOCK(atom) pthread_mutex_unlock(&(atom)->lock)
 
 /*
- * Atom definition. Call this to allow usage of an atom of a
- * particular type. See "Example" below.
+ * Atom definition. Call this to create the functions for managing an
+ * atom of a particular type. See "Example" below.
  *
  * `name`: The name of the type to use. This name will be used for all
  * functions related to the atom.

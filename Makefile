@@ -10,7 +10,7 @@ DEFAULT_FLAGS = $(DEBUG_FLAGS)
 
 LDLIBS = -lm -lpthread
 
-PROGRAMS = atom_test semaphore_test
+PROGRAMS = atom_test queue_test semaphore_test
 
 all: $(PROGRAMS)
 all: CFLAGS += $(DEFAULT_FLAGS)
@@ -24,10 +24,12 @@ profile: CFLAGS += $(PROFILE_FLAGS)
 release: $(PROGRAMS)
 release: CFLAGS += $(RELEASE_FLAGS)
 
-atom_test: atom_test.o atom.o
+atom_test: atom_test.o
+queue_test: queue_test.o
 semaphore_test: semaphore_test.o semaphore.o
 
 atom_test.o: atom.h
+queue_test.o: queue.h
 semaphore_test.o: semaphore.h
 
 clean: 
